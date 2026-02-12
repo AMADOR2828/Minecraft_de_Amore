@@ -1,0 +1,1594 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our Minecraft World 💎</title>
+    <style>
+        /* ============================================
+           MINECRAFT AUTHENTIC STYLE
+        ============================================ */
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap');
+        
+        :root {
+            /* Colores Minecraft exactos */
+            --dirt: #8B6F47;
+            --grass-top: #79C05A;
+            --grass-side: #5E9943;
+            --stone: #7F7F7F;
+            --wood: #9C6F3B;
+            --diamond: #5DCDE3;
+            --emerald: #17DD62;
+            --gold: #FCEE4B;
+            --redstone: #FF0000;
+            --coal: #2B2B2B;
+            --sky: #78A7FF;
+            
+            /* UI */
+            --ui-bg: rgba(0, 0, 0, 0.85);
+            --ui-border: #373737;
+            --ui-text: #FFFFFF;
+            --ui-hover: rgba(255, 255, 255, 0.2);
+            
+            --font-pixel: 'Press Start 2P', monospace;
+            --font-mono: 'VT323', monospace;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            image-rendering: pixelated;
+        }
+        
+        body {
+            font-family: var(--font-pixel);
+            background: linear-gradient(180deg, var(--sky) 0%, #B8D4FF 100%);
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        /* Pixel grid background */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: 
+                repeating-linear-gradient(0deg, transparent, transparent 16px, rgba(255,255,255,0.02) 16px, rgba(255,255,255,0.02) 17px),
+                repeating-linear-gradient(90deg, transparent, transparent 16px, rgba(255,255,255,0.02) 16px, rgba(255,255,255,0.02) 17px);
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        /* ============================================
+           CUBITOS TETRIS FLOTANTES
+        ============================================ */
+        .tetris-cube {
+            position: fixed;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 2px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 
+                inset 2px 2px 0 rgba(255,255,255,0.2),
+                inset -2px -2px 0 rgba(0,0,0,0.1);
+            pointer-events: none;
+            z-index: 0;
+            animation: float-tetris linear infinite;
+        }
+        
+        .tetris-cube:nth-child(1) {
+            left: 5%;
+            animation-duration: 25s;
+            animation-delay: 0s;
+        }
+        
+        .tetris-cube:nth-child(2) {
+            left: 15%;
+            width: 35px;
+            height: 35px;
+            animation-duration: 30s;
+            animation-delay: 5s;
+        }
+        
+        .tetris-cube:nth-child(3) {
+            left: 25%;
+            width: 45px;
+            height: 45px;
+            animation-duration: 28s;
+            animation-delay: 2s;
+        }
+        
+        .tetris-cube:nth-child(4) {
+            left: 40%;
+            animation-duration: 32s;
+            animation-delay: 8s;
+        }
+        
+        .tetris-cube:nth-child(5) {
+            left: 55%;
+            width: 38px;
+            height: 38px;
+            animation-duration: 27s;
+            animation-delay: 4s;
+        }
+        
+        .tetris-cube:nth-child(6) {
+            left: 70%;
+            width: 42px;
+            height: 42px;
+            animation-duration: 29s;
+            animation-delay: 6s;
+        }
+        
+        .tetris-cube:nth-child(7) {
+            left: 80%;
+            animation-duration: 26s;
+            animation-delay: 1s;
+        }
+        
+        .tetris-cube:nth-child(8) {
+            left: 90%;
+            width: 36px;
+            height: 36px;
+            animation-duration: 31s;
+            animation-delay: 7s;
+        }
+        
+        @keyframes float-tetris {
+            from {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            to {
+                transform: translateY(-150px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+        
+        /* ============================================
+           CONTAINER
+        ============================================ */
+        .game-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 10;
+        }
+        
+        /* ============================================
+           HEADER / HOTBAR
+        ============================================ */
+        .header {
+            background: var(--ui-bg);
+            border: 4px solid var(--coal);
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 
+                0 0 0 4px var(--ui-border),
+                0 8px 0 rgba(0,0,0,0.5);
+
+                /* AÑADE ESTO: */
+    position: relative;
+    z-index: 999; /* Un valor alto para que nada lo tape */
+        }
+        
+        .title {
+            color: var(--ui-text);
+            font-size: clamp(0.9rem, 4vw, 1.3rem);
+            text-align: center;
+            text-shadow: 3px 3px 0 #000;
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+        }
+        
+        .subtitle {
+            font-family: var(--font-mono);
+            font-size: clamp(1rem, 3vw, 1.2rem);
+            color: var(--gold);
+            text-align: center;
+            text-shadow: 2px 2px 0 #000;
+        }
+        
+        /* ============================================
+           TAB NAVIGATION (Inventario superior)
+        ============================================ */
+        .tab-bar {
+            display: flex;
+            gap: 5px;
+            background: var(--ui-bg);
+            padding: 10px;
+            border: 4px solid var(--coal);
+            margin-bottom: 20px;
+            overflow-x: auto;
+            box-shadow: 
+                0 0 0 4px var(--ui-border),
+                0 6px 0 rgba(0,0,0,0.5);
+        }
+        
+        .tab {
+            flex: 1;
+            min-width: 100px;
+            background: linear-gradient(180deg, #555 0%, #333 100%);
+            border: 3px solid var(--coal);
+            padding: 12px 8px;
+            color: #AAA;
+            font-size: 0.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-shadow: 2px 2px 0 #000;
+            position: relative;
+            letter-spacing: 1px;
+        }
+        
+        .tab:hover {
+            background: linear-gradient(180deg, #666 0%, #444 100%);
+            color: #CCC;
+        }
+        
+        .tab.active {
+            background: linear-gradient(180deg, var(--stone) 0%, #666 100%);
+            color: var(--ui-text);
+            border-color: var(--ui-text);
+            box-shadow: 
+                inset 0 0 10px rgba(255,255,255,0.2),
+                0 0 15px rgba(255,255,255,0.3);
+        }
+        
+        .tab-icon {
+            display: block;
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+            filter: drop-shadow(2px 2px 0 #000);
+        }
+        
+        /* ============================================
+           CONTENT SECTIONS
+        ============================================ */
+        .content-section {
+            display: none;
+            background: var(--ui-bg);
+            border: 4px solid var(--coal);
+            padding: 25px;
+            min-height: 400px;
+            box-shadow: 
+                0 0 0 4px var(--ui-border),
+                0 8px 0 rgba(0,0,0,0.5);
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .content-section.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .section-title {
+            font-size: 0.8rem;
+            color: var(--gold);
+            text-shadow: 2px 2px 0 #000;
+            margin-bottom: 20px;
+            text-align: center;
+            letter-spacing: 2px;
+        }
+        
+        /* ============================================
+           GRASS BLOCK - CUBO 3D COMPLETO Y CERRADO
+        ============================================ */
+        .grass-block-3d {
+            width: 120px;
+            height: 120px;
+            margin: 20px auto 15px;
+            position: relative;
+            transform-style: preserve-3d;
+            transform: rotateX(-35deg) rotateY(-45deg);
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        
+        .grass-block-3d:hover {
+            transform: rotateX(-35deg) rotateY(-45deg) scale(1.1);
+        }
+        
+        .grass-block-3d:active {
+            transform: rotateX(-35deg) rotateY(-45deg) scale(1.05);
+        }
+        
+        /* Cara SUPERIOR (verde) - DEBE TAPAR TODO */
+        .block-face.top {
+            width: 120px;
+            height: 120px;
+            position: absolute;
+            background-image: 
+                repeating-linear-gradient(0deg, 
+                    transparent 0px, transparent 8px, 
+                    rgba(0,0,0,0.2) 8px, rgba(0,0,0,0.2) 9px
+                ),
+                repeating-linear-gradient(90deg, 
+                    transparent 0px, transparent 8px, 
+                    rgba(0,0,0,0.2) 8px, rgba(0,0,0,0.2) 9px
+                ),
+                linear-gradient(135deg, 
+                    #7EC850 0%, #6FA844 25%, #79C05A 50%, 
+                    #6FA844 75%, #7EC850 100%
+                );
+            transform: translateZ(60px);
+            border: 4px solid #1a1a1a;
+            box-shadow: 
+                inset 0 0 20px rgba(0,0,0,0.3),
+                inset 4px 4px 0 rgba(255,255,255,0.25),
+                inset -4px -4px 0 rgba(0,0,0,0.3),
+                0 2px 5px rgba(0,0,0,0.8);
+            z-index: 1;
+            background-color: #79C05A;
+        }
+
+
+        /* Añade esto a tu CSS */
+.section-title {
+    position: relative;
+    z-index: 10; /* Le da prioridad sobre el cubo */
+}
+
+.header {
+    position: relative;
+    z-index: 10; /* Asegura que el menú nunca se tape */
+}
+
+@media (max-width: 768px) {
+    /* ... resto del código ... */
+    
+    .grass-block-3d,
+    .stone-block-3d,
+    .chest-3d {
+        margin-top: 50px; /* Añade espacio arriba del cubo */
+    }
+}
+        
+        /* Cara INFERIOR (tierra oscura) */
+        .block-face.bottom {
+            width: 120px;
+            height: 120px;
+            position: absolute;
+            background-image:
+                repeating-linear-gradient(45deg, 
+                    transparent 0px, transparent 6px,
+                    rgba(0,0,0,0.3) 6px, rgba(0,0,0,0.3) 7px
+                ),
+                linear-gradient(135deg, 
+                    #6B5437 0%, #5A4428 50%, #6B5437 100%
+                );
+            transform: rotateX(90deg) translateZ(-60px);
+            border: 4px solid #1a1a1a;
+            box-shadow: inset 0 0 30px rgba(0,0,0,0.6);
+            z-index: 1;
+        }
+        
+        /* Cara FRONTAL (lado con tierra) */
+        .block-face.front {
+            width: 120px;
+            height: 120px;
+            position: absolute;
+            background-image:
+                repeating-linear-gradient(45deg, 
+                    transparent 0px, transparent 4px,
+                    rgba(0,0,0,0.2) 4px, rgba(0,0,0,0.2) 5px
+                ),
+                linear-gradient(180deg, 
+                    var(--grass-side) 0%, 
+                    var(--grass-side) 15px, 
+                    var(--dirt) 15px, 
+                    #8B6F47 50%,
+                    #7A5F38 100%
+                );
+            transform: rotateY(0deg) translateZ(60px);
+            border: 4px solid #1a1a1a;
+            box-shadow: inset 0 3px 10px rgba(0,0,0,0.4);
+            z-index: 2;
+        }
+        
+        /* Cara TRASERA */
+        .block-face.back {
+            width: 120px;
+            height: 120px;
+            position: absolute;
+            background-image:
+                repeating-linear-gradient(-45deg, 
+                    transparent 0px, transparent 4px,
+                    rgba(0,0,0,0.25) 4px, rgba(0,0,0,0.25) 5px
+                ),
+                linear-gradient(180deg, 
+                    #5A8E3A 0%, 
+                    #5A8E3A 15px, 
+                    #7A5F38 15px, 
+                    #6B5437 100%
+                );
+            transform: rotateY(180deg) translateZ(60px);
+            border: 4px solid #1a1a1a;
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.5);
+            z-index: 1;
+        }
+        
+        /* Cara DERECHA */
+        .block-face.right {
+            width: 120px;
+            height: 120px;
+            position: absolute;
+            background-image:
+                repeating-linear-gradient(45deg, 
+                    transparent 0px, transparent 4px,
+                    rgba(0,0,0,0.25) 4px, rgba(0,0,0,0.25) 5px
+                ),
+                linear-gradient(180deg, 
+                    #5A8E3A 0%, 
+                    #5A8E3A 15px, 
+                    #7A5F38 15px, 
+                    #6B5437 100%
+                );
+            transform: rotateY(90deg) translateZ(60px);
+            border: 4px solid #1a1a1a;
+            box-shadow: inset -3px 0 10px rgba(0,0,0,0.5);
+            z-index: 2;
+        }
+        
+        /* Cara IZQUIERDA */
+        .block-face.left {
+            width: 120px;
+            height: 120px;
+            position: absolute;
+            background-image:
+                repeating-linear-gradient(-45deg, 
+                    transparent 0px, transparent 4px,
+                    rgba(0,0,0,0.2) 4px, rgba(0,0,0,0.2) 5px
+                ),
+                linear-gradient(180deg, 
+                    var(--grass-side) 0%, 
+                    var(--grass-side) 15px, 
+                    var(--dirt) 15px, 
+                    #8B6F47 100%
+                );
+            transform: rotateY(-90deg) translateZ(60px);
+            border: 4px solid #1a1a1a;
+            box-shadow: inset 3px 0 10px rgba(0,0,0,0.4);
+            z-index: 2;
+        }
+        
+        
+        .plant-sprite {
+            position: absolute;
+            top: -40px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 3rem;
+            filter: drop-shadow(3px 3px 2px rgba(0,0,0,0.6));
+            z-index: 10;
+            transition: all 0.3s ease;
+        }
+        
+        .farm-stats {
+            text-align: center;
+            margin-top: 30px;
+
+            /* SOLUCIÓN: */
+    position: relative;
+    z-index: 5;
+    transform: translateZ(100px); /* Esto lo trae al frente de la rotación del cubo */
+        }
+        
+        .stat-bar {
+            background: var(--coal);
+            height: 20px;
+            border: 3px solid var(--ui-border);
+            margin: 12px auto;
+            max-width: 280px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .stat-fill {
+            height: 100%;
+            background: repeating-linear-gradient(
+                90deg,
+                var(--emerald) 0px,
+                var(--emerald) 6px,
+                #14C357 6px,
+                #14C357 12px
+            );
+            width: 0%;
+            transition: width 0.4s ease;
+            box-shadow: inset 0 0 12px rgba(255,255,255,0.4);
+        }
+        
+        .stat-text {
+            font-family: var(--font-mono);
+            font-size: 1rem;
+            color: var(--ui-text);
+            text-shadow: 2px 2px 0 #000;
+            margin: 8px 0;
+        }
+        
+        /* ============================================
+           STONE BLOCK - CUBO 3D COMPLETO Y CERRADO
+        ============================================ */
+        .stone-block-3d {
+            width: 120px;
+            height: 120px;
+            margin: 20px auto 15px;
+            position: relative;
+            transform-style: preserve-3d;
+            transform: rotateX(-35deg) rotateY(-45deg);
+            cursor: crosshair;
+            transition: transform 0.1s ease;
+        }
+        
+        .stone-block-3d:active {
+            transform: rotateX(-35deg) rotateY(-45deg) scale(0.98);
+        }
+        
+        .stone-face {
+            position: absolute;
+            background-image:
+                repeating-linear-gradient(0deg, 
+                    transparent 0px, transparent 8px, 
+                    rgba(0,0,0,0.25) 8px, rgba(0,0,0,0.25) 9px
+                ),
+                repeating-linear-gradient(90deg, 
+                    transparent 0px, transparent 8px, 
+                    rgba(0,0,0,0.25) 8px, rgba(0,0,0,0.25) 9px
+                ),
+                repeating-linear-gradient(37deg, 
+                    transparent 0px, transparent 3px,
+                    rgba(0,0,0,0.1) 3px, rgba(0,0,0,0.1) 4px
+                ),
+                linear-gradient(135deg, 
+                    #808080 0%, #6E6E6E 25%, var(--stone) 50%, 
+                    #6E6E6E 75%, #808080 100%
+                );
+            border: 4px solid #1a1a1a;
+        }
+        
+        /* Cara SUPERIOR */
+        .stone-face.top {
+            width: 120px;
+            height: 120px;
+            transform: translateZ(60px);
+            box-shadow: 
+                inset 0 0 20px rgba(0,0,0,0.4),
+                inset 4px 4px 0 rgba(255,255,255,0.15),
+                inset -4px -4px 0 rgba(0,0,0,0.3),
+                0 2px 5px rgba(0,0,0,0.8);
+            z-index: 1;
+            background-color: var(--stone);
+        }
+        
+        /* Cara INFERIOR */
+        .stone-face.bottom {
+            width: 120px;
+            height: 120px;
+            transform: rotateX(90deg) translateZ(-60px);
+            box-shadow: inset 0 0 30px rgba(0,0,0,0.6);
+            z-index: 1;
+        }
+        
+        /* Cara FRONTAL */
+        .stone-face.front {
+            width: 120px;
+            height: 120px;
+            transform: rotateY(0deg) translateZ(60px);
+            box-shadow: inset 0 3px 15px rgba(0,0,0,0.5);
+            z-index: 2;
+        }
+        
+        /* Cara TRASERA */
+        .stone-face.back {
+            width: 120px;
+            height: 120px;
+            transform: rotateY(180deg) translateZ(60px);
+            box-shadow: inset 0 0 18px rgba(0,0,0,0.5);
+            z-index: 1;
+        }
+        
+        /* Cara DERECHA */
+        .stone-face.right {
+            width: 120px;
+            height: 120px;
+            transform: rotateY(90deg) translateZ(60px);
+            box-shadow: inset -3px 0 15px rgba(0,0,0,0.6);
+            z-index: 2;
+        }
+        
+        /* Cara IZQUIERDA */
+        .stone-face.left {
+            width: 120px;
+            height: 120px;
+            transform: rotateY(-90deg) translateZ(60px);
+            box-shadow: inset 3px 0 15px rgba(0,0,0,0.5);
+            z-index: 2;
+        }
+        
+        .crack-layer {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            transition: opacity 0.2s;
+            mix-blend-mode: multiply;
+        }
+        
+        .crack-layer.active {
+            opacity: 1;
+        }
+        
+        /* Grietas progresivas */
+        .crack-1 { 
+            background: repeating-linear-gradient(23deg, transparent 0px, transparent 15px, rgba(0,0,0,0.4) 15px, rgba(0,0,0,0.4) 17px);
+        }
+        .crack-2 { 
+            background: 
+                repeating-linear-gradient(23deg, transparent 0px, transparent 12px, rgba(0,0,0,0.5) 12px, rgba(0,0,0,0.5) 15px),
+                repeating-linear-gradient(-45deg, transparent 0px, transparent 12px, rgba(0,0,0,0.5) 12px, rgba(0,0,0,0.5) 15px);
+        }
+        .crack-3 { 
+            background: 
+                repeating-linear-gradient(23deg, transparent 0px, transparent 8px, rgba(0,0,0,0.6) 8px, rgba(0,0,0,0.6) 12px),
+                repeating-linear-gradient(-45deg, transparent 0px, transparent 8px, rgba(0,0,0,0.6) 8px, rgba(0,0,0,0.6) 12px),
+                repeating-linear-gradient(90deg, transparent 0px, transparent 8px, rgba(0,0,0,0.6) 8px, rgba(0,0,0,0.6) 12px);
+        }
+        
+        .stone-block-3d.breaking {
+            animation: block-shake 0.15s ease;
+        }
+        
+        @keyframes block-shake {
+            0%, 100% { transform: rotateX(-35deg) rotateY(-45deg); }
+            25% { transform: rotateX(-35deg) rotateY(-45deg) translate(-6px, 6px); }
+            75% { transform: rotateX(-35deg) rotateY(-45deg) translate(6px, -6px); }
+        }
+        
+        .stone-block-3d.destroyed {
+            animation: block-explode 0.5s ease forwards;
+        }
+        
+        @keyframes block-explode {
+            0% { opacity: 1; transform: rotateX(-35deg) rotateY(-45deg) scale(1); }
+            50% { transform: rotateX(-35deg) rotateY(-45deg) scale(1.2); }
+            100% { opacity: 0; transform: rotateX(-35deg) rotateY(-45deg) scale(0.2) rotateZ(360deg); }
+        }
+        
+        /* ============================================
+           CRAFTING TABLE (Memoria reducida)
+        ============================================ */
+        .crafting-table {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        
+        .crafting-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            background: rgba(0,0,0,0.4);
+            padding: 15px;
+            border: 4px solid var(--coal);
+            margin-bottom: 20px;
+        }
+        
+        .crafting-slot {
+            aspect-ratio: 1;
+            background: var(--ui-bg);
+            border: 3px solid var(--ui-border);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            transition: all 0.2s ease;
+            box-shadow: 
+                inset 3px 3px 0 rgba(255,255,255,0.1),
+                inset -3px -3px 0 rgba(0,0,0,0.6);
+            position: relative;
+        }
+        
+        .crafting-slot::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: repeating-linear-gradient(0deg, transparent 0px, transparent 8px, rgba(255,255,255,0.02) 8px, rgba(255,255,255,0.02) 9px);
+        }
+        
+        .crafting-slot:hover:not(.flipped):not(.matched) {
+            border-color: var(--ui-text);
+            background: rgba(255,255,255,0.05);
+            transform: scale(1.05);
+        }
+        
+        .crafting-slot:active {
+            transform: scale(0.95);
+        }
+        
+        .crafting-slot.flipped,
+        .crafting-slot.matched {
+            background: var(--coal);
+        }
+        
+        .crafting-slot.matched {
+            border-color: var(--emerald);
+            background: linear-gradient(135deg, var(--grass-top) 0%, var(--grass-side) 100%);
+            animation: craft-success 0.5s ease;
+        }
+        
+        @keyframes craft-success {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.15) rotate(5deg); }
+        }
+        
+        .card-back { display: none; }
+        .crafting-slot.flipped .card-back,
+        .crafting-slot.matched .card-back { display: block; }
+        .crafting-slot.flipped .card-front,
+        .crafting-slot.matched .card-front { display: none; }
+        
+        .btn-reset {
+            background: linear-gradient(180deg, var(--wood) 0%, #7A5530 100%);
+            border: 4px solid var(--coal);
+            color: var(--ui-text);
+            padding: 12px 24px;
+            font-family: var(--font-pixel);
+            font-size: 0.6rem;
+            cursor: pointer;
+            text-shadow: 2px 2px 0 #000;
+            display: block;
+            margin: 0 auto;
+            letter-spacing: 1px;
+            box-shadow: 
+                inset 2px 2px 0 rgba(255,255,255,0.3),
+                0 4px 0 rgba(0,0,0,0.5);
+            transition: all 0.1s ease;
+        }
+        
+        .btn-reset:hover {
+            background: linear-gradient(180deg, #B08040 0%, var(--wood) 100%);
+        }
+        
+        .btn-reset:active {
+            transform: translateY(4px);
+            box-shadow: 
+                inset 2px 2px 0 rgba(0,0,0,0.3),
+                0 0 0 rgba(0,0,0,0.5);
+        }
+        
+        /* ============================================
+           CHEST - COFRE ESTILO MINECRAFT
+        ============================================ */
+        .chest-3d {
+            width: 140px;
+            height: 100px;
+            margin: 20px auto 15px;
+            position: relative;
+            transform-style: preserve-3d;
+            transform: rotateX(-35deg) rotateY(-45deg);
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        
+        .chest-3d:hover:not(.locked) {
+            transform: rotateX(-35deg) rotateY(-45deg) scale(1.1);
+        }
+        
+        .chest-3d.locked {
+            cursor: not-allowed;
+            filter: grayscale(100%) brightness(0.4);
+        }
+        
+        .chest-face {
+            position: absolute;
+            background-image:
+                repeating-linear-gradient(0deg, 
+                    transparent 0px, transparent 10px, 
+                    rgba(0,0,0,0.35) 10px, rgba(0,0,0,0.35) 12px,
+                    transparent 12px, transparent 22px
+                ),
+                repeating-linear-gradient(90deg, 
+                    transparent 0px, transparent 7px,
+                    rgba(0,0,0,0.15) 7px, rgba(0,0,0,0.15) 8px
+                ),
+                linear-gradient(90deg, 
+                    var(--wood) 0%, #8A6535 30%, 
+                    var(--wood) 50%, #8A6535 70%, 
+                    var(--wood) 100%
+                );
+            border: 4px solid #1a1a1a;
+        }
+        
+        /* Cara SUPERIOR (rectangular) */
+        .chest-face.top {
+            width: 140px;
+            height: 100px;
+            transform: translateZ(50px);
+            box-shadow: 
+                inset 0 0 18px rgba(0,0,0,0.4),
+                inset 4px 4px 0 rgba(255,255,255,0.25),
+                inset -4px -4px 0 rgba(0,0,0,0.3),
+                0 2px 5px rgba(0,0,0,0.8);
+            z-index: 1;
+            background-color: var(--wood);
+        }
+        
+        /* Cara INFERIOR */
+        .chest-face.bottom {
+            width: 140px;
+            height: 100px;
+            transform: rotateX(90deg) translateZ(-50px);
+            box-shadow: inset 0 0 30px rgba(0,0,0,0.6);
+            z-index: 1;
+        }
+        
+        /* Cara FRONTAL (cuadrada, con cerradura) */
+        .chest-face.front {
+            width: 140px;
+            height: 100px;
+            transform: rotateY(0deg) translateZ(50px);
+            box-shadow: inset 0 3px 15px rgba(0,0,0,0.5);
+            z-index: 2;
+        }
+        
+        /* Cara TRASERA */
+        .chest-face.back {
+            width: 140px;
+            height: 100px;
+            transform: rotateY(180deg) translateZ(50px);
+            box-shadow: inset 0 0 18px rgba(0,0,0,0.5);
+            z-index: 1;
+        }
+        
+        /* Cara DERECHA (rectangular lateral) */
+        .chest-face.right {
+            width: 100px;
+            height: 100px;
+            transform: rotateY(90deg) translateZ(90px);
+            box-shadow: inset -3px 0 15px rgba(0,0,0,0.6);
+            z-index: 2;
+        }
+        
+        /* Cara IZQUIERDA */
+        .chest-face.left {
+            width: 100px;
+            height: 100px;
+            transform: rotateY(-90deg) translateZ(50px);
+            box-shadow: inset 3px 0 15px rgba(0,0,0,0.5);
+            z-index: 2;
+        }
+        
+        .chest-lock {
+            position: absolute;
+            width: 40px;
+            height: 30px;
+            background: linear-gradient(135deg, var(--gold) 0%, #E8D948 50%, var(--gold) 100%);
+            border: 3px solid var(--coal);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+            box-shadow: 
+                inset 3px 3px 0 rgba(255,255,255,0.6),
+                inset -3px -3px 0 rgba(0,0,0,0.4),
+                0 3px 6px rgba(0,0,0,0.6);
+        }
+        
+        .chest-lock::after {
+            content: '🔒';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1.5rem;
+            filter: drop-shadow(1px 1px 1px #000);
+        }
+        
+        .chest-3d:not(.locked) .chest-lock::after {
+            content: '';
+        }
+        
+        .chest-3d.opening {
+            animation: chest-open 0.8s ease;
+        }
+        
+        @keyframes chest-open {
+            0%, 100% { transform: rotateX(-35deg) rotateY(-45deg); }
+            20% { transform: rotateX(-35deg) rotateY(-45deg) translateY(-30px) scale(1.05); }
+            40% { transform: rotateX(-35deg) rotateY(-45deg) translateY(0px) scale(1.15) rotateZ(10deg); }
+            60% { transform: rotateX(-35deg) rotateY(-45deg) scale(1.12) rotateZ(-10deg); }
+            80% { transform: rotateX(-35deg) rotateY(-45deg) scale(1.05); }
+        }
+        
+        .chest-content {
+            display: none;
+            background: rgba(0,0,0,0.9);
+            border: 4px solid var(--diamond);
+            padding: 25px;
+            margin-top: 30px;
+            box-shadow: 
+                0 0 30px var(--diamond),
+                inset 0 0 30px rgba(93, 205, 227, 0.3);
+        }
+        
+        .chest-content.visible {
+            display: block;
+            animation: content-glow 0.6s ease;
+        }
+        
+        @keyframes content-glow {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        
+        .chest-content h3 {
+            font-size: 0.9rem;
+            color: var(--diamond);
+            text-shadow: 2px 2px 0 #000, 0 0 10px var(--diamond);
+            margin-bottom: 20px;
+            text-align: center;
+            letter-spacing: 3px;
+        }
+        
+        .chest-content p {
+            font-family: var(--font-mono);
+            font-size: 1.15rem;
+            color: var(--ui-text);
+            text-shadow: 2px 2px 0 #000;
+            line-height: 1.7;
+            margin-bottom: 15px;
+        }
+        
+        /* ============================================
+           MOB SECTION
+        ============================================ */
+        .mob-display {
+            text-align: center;
+        }
+        
+        .mob-sprite {
+            font-size: 7rem;
+            display: inline-block;
+            filter: drop-shadow(5px 5px 0 rgba(0,0,0,0.7));
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+        
+        .mob-sprite:hover {
+            transform: scale(1.1);
+        }
+        
+        .mob-sprite:active {
+            transform: scale(0.95);
+        }
+        
+        .mob-sprite.attack {
+            animation: mob-jump 0.5s ease;
+        }
+        
+        @keyframes mob-jump {
+            0%, 100% { transform: translateY(0); }
+            25% { transform: translateY(-30px) rotate(-15deg); }
+            75% { transform: translateY(-30px) rotate(15deg); }
+        }
+        
+        /* ============================================
+           PARTICLES
+        ============================================ */
+        .particle {
+            position: fixed;
+            pointer-events: none;
+            z-index: 99999;
+            font-size: 2rem;
+            filter: drop-shadow(2px 2px 0 rgba(0,0,0,0.6));
+        }
+        
+        .particle.fall {
+            animation: fall-down 1.2s ease-out forwards;
+        }
+        
+        @keyframes fall-down {
+            0% { opacity: 1; transform: translateY(-30px) scale(1); }
+            100% { opacity: 0; transform: translateY(120px) scale(0.4); }
+        }
+        
+        .particle.explode {
+            animation: explode-out 1.5s ease-out forwards;
+        }
+        
+        @keyframes explode-out {
+            0% { opacity: 1; transform: translate(0, 0) scale(1) rotate(0deg); }
+            100% { opacity: 0; transform: translate(var(--tx), var(--ty)) scale(0) rotate(720deg); }
+        }
+        
+        /* ============================================
+           RESPONSIVE
+        ============================================ */
+        @media (max-width: 768px) {
+            .game-container {
+                padding: 10px;
+            }
+            
+            .tab {
+                min-width: 80px;
+                padding: 10px 5px;
+                font-size: 0.45rem;
+            }
+            
+            .tab-icon {
+                font-size: 1.2rem;
+            }
+            
+            .title {
+                font-size: 0.75rem;
+            }
+            
+            .grass-block-3d,
+            .stone-block-3d {
+                width: 160px;
+                height: 160px;
+            }
+            
+            .block-face.top,
+            .stone-face.top,
+            .block-face.bottom,
+            .stone-face.bottom,
+            .block-face.front,
+            .stone-face.front,
+            .block-face.back,
+            .stone-face.back,
+            .block-face.right,
+            .stone-face.right,
+            .block-face.left,
+            .stone-face.left {
+                width: 160px;
+                height: 160px;
+            }
+            
+            .block-face.top,
+            .stone-face.top {
+                transform: translateZ(80px);
+            }
+            
+            .block-face.bottom,
+            .stone-face.bottom {
+                transform: rotateX(90deg) translateZ(-80px);
+            }
+            
+            .block-face.front,
+            .stone-face.front {
+                transform: rotateY(0deg) translateZ(80px);
+            }
+            
+            .block-face.back,
+            .stone-face.back {
+                transform: rotateY(180deg) translateZ(80px);
+            }
+            
+            .block-face.right,
+            .stone-face.right {
+                transform: rotateY(90deg) translateZ(80px);
+            }
+            
+            .block-face.left,
+            .stone-face.left {
+                transform: rotateY(-90deg) translateZ(80px);
+            }
+            
+            .plant-sprite {
+                font-size: 3.5rem;
+                top: -50px;
+            }
+            
+            .crafting-slot {
+                font-size: 2rem;
+            }
+            
+            .mob-sprite {
+                font-size: 5rem;
+            }
+            
+            .chest-3d {
+                width: 180px;
+                height: 180px;
+            }
+            
+            .chest-face.top,
+            .chest-face.bottom,
+            .chest-face.front,
+            .chest-face.back,
+            .chest-face.right,
+            .chest-face.left {
+                width: 180px;
+                height: 180px;
+            }
+            
+            .chest-face.top {
+                transform: translateZ(90px);
+            }
+            
+            .chest-face.bottom {
+                transform: rotateX(90deg) translateZ(-90px);
+            }
+            
+            .chest-face.front {
+                transform: rotateY(0deg) translateZ(90px);
+            }
+            
+            .chest-face.back {
+                transform: rotateY(180deg) translateZ(90px);
+            }
+            
+            .chest-face.right {
+                transform: rotateY(90deg) translateZ(90px);
+            }
+            
+            .chest-face.left {
+                transform: rotateY(-90deg) translateZ(90px);
+            }
+        }
+    </style>
+</head>
+<body>
+    
+    <!-- Cubitos Tetris flotantes -->
+    <div class="tetris-cube"></div>
+    <div class="tetris-cube"></div>
+    <div class="tetris-cube"></div>
+    <div class="tetris-cube"></div>
+    <div class="tetris-cube"></div>
+    <div class="tetris-cube"></div>
+    <div class="tetris-cube"></div>
+    <div class="tetris-cube"></div>
+    
+    <div class="game-container">
+        
+        <!-- HEADER -->
+        <div class="header">
+            <h1 class="title">⛏ NUESTRO MUNDO MINECRAFT ⛏</h1>
+            <p class="subtitle">1 MES EN MODO SUPERVIVENCIA AMOR</p>
+        </div>
+        
+        <!-- TAB NAVIGATION -->
+        <div class="tab-bar">
+            <div class="tab active" data-tab="farm">
+                <span class="tab-icon">🌾</span>
+                GRANJA
+            </div>
+            <div class="tab" data-tab="mine">
+                <span class="tab-icon">⛏</span>
+                MINA
+            </div>
+            <div class="tab" data-tab="craft">
+                <span class="tab-icon">🔨</span>
+                CRAFTEO
+            </div>
+            <div class="tab" data-tab="mob">
+                <span class="tab-icon">🐺</span>
+                MOBS
+            </div>
+            <div class="tab" data-tab="chest">
+                <span class="tab-icon">📦</span>
+                COFRE
+            </div>
+        </div>
+        
+        <!-- FARM SECTION -->
+        <div class="content-section active" id="farm">
+            <h2 class="section-title">◆ SISTEMA DE CULTIVO ◆</h2>
+            
+            <div class="grass-block-3d" id="grassBlock">
+                <div class="plant-sprite" id="plantSprite">🌱</div>
+                <div class="block-face top"></div>
+                <div class="block-face bottom"></div>
+                <div class="block-face front"></div>
+                <div class="block-face back"></div>
+                <div class="block-face right"></div>
+                <div class="block-face left"></div>
+            </div>
+            
+            <div class="farm-stats">
+                <p class="stat-text" id="farmMessage">HAZ CLIC PARA REGAR</p>
+                <div class="stat-bar">
+                    <div class="stat-fill" id="farmProgress"></div>
+                </div>
+                <p class="stat-text" id="farmCounter">CRECIMIENTO: 0/20</p>
+            </div>
+        </div>
+        
+        <!-- MINING SECTION -->
+        <div class="content-section" id="mine">
+            <h2 class="section-title">◆ OPERACIÓN MINERA ◆</h2>
+            
+            <div class="stone-block-3d" id="stoneBlock">
+                <div class="stone-face top">
+                    <div class="crack-layer crack-1" data-crack="1"></div>
+                    <div class="crack-layer crack-2" data-crack="2"></div>
+                    <div class="crack-layer crack-3" data-crack="3"></div>
+                </div>
+                <div class="stone-face bottom"></div>
+                <div class="stone-face front"></div>
+                <div class="stone-face back"></div>
+                <div class="stone-face right"></div>
+                <div class="stone-face left"></div>
+            </div>
+            
+            <div class="farm-stats">
+                <p class="stat-text" id="mineProgress">DURABILIDAD: 10/10</p>
+                <p class="stat-text" id="mineMessage">HAZ CLIC PARA MINAR AMOR</p>
+            </div>
+        </div>
+        
+        <!-- CRAFTING SECTION -->
+        <div class="content-section" id="craft">
+            <h2 class="section-title">◆ MESA DE CRAFTEO ◆</h2>
+            
+            <div class="crafting-table">
+                <div class="crafting-grid" id="craftingGrid">
+                    <!-- Generated by JS -->
+                </div>
+                <p class="stat-text" id="craftMessage" style="text-align: center; margin-bottom: 15px;">ENCUENTRA TODAS LAS PAREJAS AMOR</p>
+                <button class="btn-reset" id="resetCraft">REINICIAR</button>
+            </div>
+        </div>
+        
+        <!-- MOB SECTION -->
+        <div class="content-section" id="mob">
+            <h2 class="section-title">◆ CRIATURAS DOMESTICADAS ◆</h2>
+            
+            <div class="mob-display">
+                <div class="mob-sprite" id="mobSprite">🐺</div>
+                <div class="farm-stats">
+                    <p class="stat-text" id="mobMessage">HAZ CLIC PARA INTERACTUAR Y ADOPTAR AMOR</p>
+                    <p class="stat-text" id="mobCounter">ANIMALITOS EN CASA: 0</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- CHEST SECTION -->
+        <div class="content-section" id="chest">
+            <h2 class="section-title">◆ BÓVEDA DEL TESORO ◆</h2>
+            
+            <div class="chest-3d locked" id="chestBlock">
+                <div class="chest-face top"></div>
+                <div class="chest-face bottom"></div>
+                <div class="chest-face front">
+                    <div class="chest-lock"></div>
+                </div>
+                <div class="chest-face back"></div>
+                <div class="chest-face right"></div>
+                <div class="chest-face left"></div>
+            </div>
+            
+            <div class="farm-stats">
+                <p class="stat-text" id="chestMessage">COMPLETA TODAS LAS TAREAS PARA DESBLOQUEAR</p>
+            </div>
+            
+            <div class="chest-content" id="chestContent">
+                <h3>◆ CARTA DE AMOR ◆</h3>
+                <p>Hey amor,</p>
+                <p>Este mes ha sido épico. Como en Minecraft, hemos estado construyendo algo increíble juntos, bloque por bloque, incluso con la distancia.</p>
+                <p>Cada día contigo es una nueva aventura. Eres mi compañera de survival mode favorita.</p>
+                <p>Seguiremos minando diamantes y construyendo nuestro mundo juntos. No importa la distancia, siempre estamos en el mismo server.</p>
+                <p style="text-align: right; margin-top: 20px; color: var(--diamond);">Te amo ATT: Idanya A. ⛏💎</p>
+            </div>
+        </div>
+        
+    </div>
+
+    <script>
+        // ============================================
+        // GAME STATE
+        // ============================================
+        const state = {
+            farm: { clicks: 0, max: 20, stage: 0 },
+            mine: { clicks: 0, max: 10, broken: false },
+            craft: { completed: false, flipped: [], matches: 0, canFlip: true },
+            mob: { clicks: 0 },
+            chest: { unlocked: false }
+        };
+
+        // ============================================
+        // TAB NAVIGATION
+        // ============================================
+        const tabs = document.querySelectorAll('.tab');
+        const sections = document.querySelectorAll('.content-section');
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const target = tab.dataset.tab;
+                
+                tabs.forEach(t => t.classList.remove('active'));
+                sections.forEach(s => s.classList.remove('active'));
+                
+                tab.classList.add('active');
+                document.getElementById(target).classList.add('active');
+            });
+        });
+
+        // ============================================
+        // FARMING
+        // ============================================
+        const crops = ['🌱', '🌿', '🌾', '🌻'];
+        const farmMsgs = [
+            "REGANDO...", "CRECIMIENTO +1", "HIDRATADO", "LUZ SOLAR OK",
+            "FERTILIZADO", "CRECIENDO RÁPIDO", "NIVEL SUBIÓ", "MADURANDO",
+            "LISTO PRONTO", "CASI LISTO", "TIEMPO DE COSECHA", "CULTIVO PERFECTO"
+        ];
+
+        const grassBlock = document.getElementById('grassBlock');
+        const plantSprite = document.getElementById('plantSprite');
+        const farmMessage = document.getElementById('farmMessage');
+        const farmProgress = document.getElementById('farmProgress');
+        const farmCounter = document.getElementById('farmCounter');
+
+        grassBlock.addEventListener('click', (e) => {
+            if (state.farm.clicks >= state.farm.max) return;
+            
+            state.farm.clicks++;
+            createParticle('💧', e.clientX, e.clientY, 'fall');
+            
+            const pct = (state.farm.clicks / state.farm.max) * 100;
+            farmProgress.style.width = pct + '%';
+            farmCounter.textContent = `CRECIMIENTO: ${state.farm.clicks}/${state.farm.max}`;
+            
+            farmMessage.textContent = farmMsgs[Math.floor(Math.random() * farmMsgs.length)];
+            
+            const newStage = Math.floor((state.farm.clicks / state.farm.max) * crops.length);
+            if (newStage !== state.farm.stage && newStage < crops.length) {
+                state.farm.stage = newStage;
+                plantSprite.textContent = crops[newStage];
+            }
+            
+            if (state.farm.clicks === state.farm.max) {
+                farmMessage.textContent = "✓ ¡GRANJA COMPLETADA!";
+                explode(grassBlock, ['🌾', '🌻', '✨']);
+                checkUnlock();
+            }
+        });
+
+        // ============================================
+        // MINING
+        // ============================================
+        const stoneBlock = document.getElementById('stoneBlock');
+        const mineProgress = document.getElementById('mineProgress');
+        const mineMessage = document.getElementById('mineMessage');
+        const cracks = stoneBlock.querySelectorAll('.crack-layer');
+
+        stoneBlock.addEventListener('click', (e) => {
+            if (state.mine.broken) return;
+            
+            state.mine.clicks++;
+            const left = state.mine.max - state.mine.clicks;
+            mineProgress.textContent = `DURABILITY: ${left}/10`;
+            
+            stoneBlock.classList.add('breaking');
+            setTimeout(() => stoneBlock.classList.remove('breaking'), 150);
+            
+            createParticle('⬛', e.clientX, e.clientY, 'explode');
+            
+            const damage = state.mine.clicks / state.mine.max;
+            cracks.forEach(c => c.classList.remove('active'));
+            if (damage > 0.3) cracks[0].classList.add('active');
+            if (damage > 0.6) cracks[1].classList.add('active');
+            if (damage > 0.85) cracks[2].classList.add('active');
+            
+            if (state.mine.clicks >= state.mine.max) {
+                state.mine.broken = true;
+                stoneBlock.classList.add('destroyed');
+                
+                setTimeout(() => {
+                    stoneBlock.style.display = 'none';
+                    mineProgress.style.display = 'none';
+                    mineMessage.innerHTML = '💎 ¡DIAMANTE ENCONTRADO! 💎<br>"MÁS RARO QUE LOS DIAMANTES"';
+                    explode(document.getElementById('mine'), ['💎', '✨', '⭐']);
+                    checkUnlock();
+                }, 500);
+            }
+        });
+
+        // ============================================
+        // CRAFTING (3 PARES = 6 CARTAS)
+        // ============================================
+        const craftIcons = ['⛏', '🗡', '💎'];
+        const craftingGrid = document.getElementById('craftingGrid');
+        const craftMessage = document.getElementById('craftMessage');
+        const resetCraft = document.getElementById('resetCraft');
+        let cards = [];
+
+        function initCraft() {
+            craftingGrid.innerHTML = '';
+            state.craft = { completed: false, flipped: [], matches: 0, canFlip: true };
+            
+            const pairs = [...craftIcons, ...craftIcons];
+            pairs.sort(() => Math.random() - 0.5);
+            
+            cards = pairs.map((icon, i) => {
+                const slot = document.createElement('div');
+                slot.className = 'crafting-slot';
+                slot.dataset.icon = icon;
+                slot.dataset.index = i;
+                slot.innerHTML = `
+                    <span class="card-front">❓</span>
+                    <span class="card-back">${icon}</span>
+                `;
+                slot.addEventListener('click', flipCard);
+                craftingGrid.appendChild(slot);
+                return slot;
+            });
+            
+            craftMessage.textContent = 'ENCUENTRA TODAS LAS PAREJAS';
+        }
+
+        function flipCard() {
+            if (!state.craft.canFlip) return;
+            if (this.classList.contains('flipped') || this.classList.contains('matched')) return;
+            if (state.craft.flipped.length >= 2) return;
+            
+            this.classList.add('flipped');
+            state.craft.flipped.push(this);
+            
+            if (state.craft.flipped.length === 2) {
+                state.craft.canFlip = false;
+                checkMatch();
+            }
+        }
+
+        function checkMatch() {
+            const [c1, c2] = state.craft.flipped;
+            const match = c1.dataset.icon === c2.dataset.icon;
+            
+            setTimeout(() => {
+                if (match) {
+                    c1.classList.add('matched');
+                    c2.classList.add('matched');
+                    c1.classList.remove('flipped');
+                    c2.classList.remove('flipped');
+                    state.craft.matches++;
+                    
+                    if (state.craft.matches === craftIcons.length) {
+                        state.craft.completed = true;
+                        craftMessage.textContent = '✓ ¡CRAFTEO COMPLETADO!';
+                        explode(craftingGrid, ['✨', '⚡']);
+                        checkUnlock();
+                    }
+                } else {
+                    c1.classList.remove('flipped');
+                    c2.classList.remove('flipped');
+                }
+                
+                state.craft.flipped = [];
+                state.craft.canFlip = true;
+            }, 700);
+        }
+
+        resetCraft.addEventListener('click', initCraft);
+        initCraft();
+
+        // ============================================
+        // MOB
+        // ============================================
+        const mobs = ['🐺', '🐱', '🐕', '🦊', '🐼', '🐷', '🐮', '🐔', '🐑', '🦜'];
+        const mobMsgs = [
+            "¡UNO MÁS PARA LA COLECCIÓN! 🏠",
+            "TU CASA SE ESTÁ LLENANDO... 😅",
+            "¡ADOPTADO! BIENVENIDO A CASA 🏡",
+            "ESTO ES UN ZOOLÓGICO YA 🦁",
+            "¿CUÁNTOS MÁS VAS A TRAER? 😂",
+            "LA CASA ESTÁ FULL DE PELUDOS 🐾",
+            "¡OTRO INQUILINO! 🎉",
+            "VECINOS QUEJÁNDOSE DEL RUIDO... 🔊",
+            "NECESITAS UNA CASA MÁS GRANDE 😱",
+            "¡AMOR INCONDICIONAL X1000! 💕"
+        ];
+
+        const mobSprite = document.getElementById('mobSprite');
+        const mobMessage = document.getElementById('mobMessage');
+        const mobCounter = document.getElementById('mobCounter');
+
+        mobSprite.addEventListener('click', (e) => {
+            state.mob.clicks++;
+            
+            mobSprite.textContent = mobs[state.mob.clicks % mobs.length];
+            mobSprite.classList.add('attack');
+            setTimeout(() => mobSprite.classList.remove('attack'), 500);
+            
+            mobMessage.textContent = mobMsgs[Math.floor(Math.random() * mobMsgs.length)];
+            mobCounter.textContent = `ANIMALITOS EN CASA: ${state.mob.clicks}`;
+            
+            if (state.mob.clicks % 3 === 0) {
+                createParticle('❤️', e.clientX, e.clientY, 'fall');
+            }
+            
+            if (state.mob.clicks >= 5) checkUnlock();
+        });
+
+        // ============================================
+        // CHEST
+        // ============================================
+        const chestBlock = document.getElementById('chestBlock');
+        const chestMessage = document.getElementById('chestMessage');
+        const chestContent = document.getElementById('chestContent');
+
+        function checkUnlock() {
+            const farmOK = state.farm.clicks >= state.farm.max;
+            const mineOK = state.mine.broken;
+            const craftOK = state.craft.completed;
+            const mobOK = state.mob.clicks >= 5;
+            
+            if (farmOK && mineOK && craftOK && mobOK && !state.chest.unlocked) {
+                state.chest.unlocked = true;
+                chestBlock.classList.remove('locked');
+                chestMessage.textContent = '✓ ¡DESBLOQUEADO! HAZ CLIC PARA ABRIR';
+                chestMessage.style.color = 'var(--emerald)';
+                explode(chestBlock, ['✨', '💎', '⭐']);
+            }
+        }
+
+        chestBlock.addEventListener('click', () => {
+            if (!state.chest.unlocked) {
+                chestMessage.style.animation = 'block-shake 0.3s ease';
+                setTimeout(() => chestMessage.style.animation = '', 300);
+                return;
+            }
+            
+            chestBlock.classList.add('opening');
+            setTimeout(() => {
+                chestContent.classList.add('visible');
+                explode(chestContent, ['💎', '💖', '✨', '⭐', '🌟', '💫']);
+            }, 800);
+        });
+
+        // ============================================
+        // PARTICLES
+        // ============================================
+        function createParticle(emoji, x, y, type) {
+            const p = document.createElement('div');
+            p.className = `particle ${type}`;
+            p.textContent = emoji;
+            p.style.left = x + 'px';
+            p.style.top = y + 'px';
+            
+            if (type === 'explode') {
+                const angle = Math.random() * Math.PI * 2;
+                const dist = 60 + Math.random() * 120;
+                p.style.setProperty('--tx', Math.cos(angle) * dist + 'px');
+                p.style.setProperty('--ty', Math.sin(angle) * dist + 'px');
+            }
+            
+            document.body.appendChild(p);
+            setTimeout(() => p.remove(), 1500);
+        }
+
+        function explode(el, emojis) {
+            const rect = el.getBoundingClientRect();
+            const cx = rect.left + rect.width / 2;
+            const cy = rect.top + rect.height / 2;
+            
+            for (let i = 0; i < 15; i++) {
+                setTimeout(() => {
+                    const emoji = emojis[Math.floor(Math.random() * emojis.length)];
+                    createParticle(emoji, cx, cy, 'explode');
+                }, i * 40);
+            }
+        }
+
+        // ============================================
+        // INIT
+        // ============================================
+        console.log('⛏ MUNDO CARGADO ⛏');
+    </script>
+</body>
+</html>
